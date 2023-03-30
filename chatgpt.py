@@ -1,27 +1,40 @@
 # chatgpt.py
 
 import pkg_resources
-from epc.server import EPCServer
-from chatgpt_wrapper import ChatGPT
+import openai
+import os
+assert 'OPENAI_API_KEY' in os.environ
 
-MIN_BREAKCHANGE_VERSION = "0.5.0"
-IS_BREAKING_CHANGE = pkg_resources.get_distribution("ChatGPT").parsed_version \
-                     >= pkg_resources.parse_version(MIN_BREAKCHANGE_VERSION)
 
-server = EPCServer(('localhost', 0))
-bot = None
-
-@server.register_function
 def query(query):
-    global bot
-    if bot is None:
-        bot = ChatGPT()
-    response = bot.ask(query)
-    if IS_BREAKING_CHANGE:
-        # the return values have changed since 0.5.0
-        # https://github.com/mmabrouk/chatgpt-wrapper/commit/bc13f3dfc838aaa9299a5137723718081acd8eac#diff-b335630551682c19a781afebcf4d07bf978fb1f8ac04c6bf87428ed5106870f5R21
-        success, response, message = response
-    return response
+    response = openai.ChatCompletion.create(
+        model="gpt4",
+        messages=[
+            {
+                "role": "system",
+                "content":'. '.join((
+                    "You are an AI emacs assistant",
+                    "Respond to the user's requests by describing or rewriting code",
+                    "If the user's request sounds like a command that emacs can do,"
+                    " generate the emacs-lisp code for that command",
+                ))
+            },
+            {
+                "role": "user",
+                "content": query
+            },
+        ],
+        temperature=0.3,
+    )
+    return response['choices'][0]['message']['content']
 
+
+from epc.server import EPCServer
+server = EPCServer(('localhost', 0))
+server.register_function(query)
 server.print_port()
 server.serve_forever()
+
+
+#if __name__ == '__main__':
+#    print(query('hello'))

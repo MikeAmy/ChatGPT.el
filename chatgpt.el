@@ -62,22 +62,22 @@
   (interactive)
   (shell-command "chatgpt install &"))
 
+(defvar python-interpreter (shell-command-to-string "which python"))
+
+; (setq python-interpreter (shell-command-to-string "which python"))
+
 ;;;###autoload
 (defun chatgpt-init ()
   "Initialize the ChatGPT server.
 
 This function creates the ChatGPT process and starts it. It also
-initializes the ChatGPT buffer, enabling visual line mode in it. A
-message is displayed to indicate that the initialization was
+initializes the ChatGPT buffer, enabling visual line mode in it.
+A message is displayed to indicate that the initialization was
 successful.
 
 If ChatGPT server is not initialized, 'chatgpt-query' calls this
 function."
   (interactive)
-  (when (equal (shell-command-to-string "pip list | grep chatGPT") "")
-    (shell-command "pip install git+https://github.com/mmabrouk/chatgpt-wrapper")
-    (message "chatgpt-wrapper installed through pip.")
-    (chatgpt-login))
   (when (null chatgpt-repo-path)
     (error "chatgpt-repo-path is nil. Please set chatgpt-repo-path as specified in joshcho/ChatGPT.el"))
   (setq chatgpt-process (epc:start-epc python-interpreter (list (expand-file-name
