@@ -62,7 +62,7 @@
   (interactive)
   (shell-command "chatgpt install &"))
 
-(defvar python-interpreter (shell-command-to-string "which python"))
+(defvar python-interpreter (string-trim (shell-command-to-string "which python")))
 
 ; (setq python-interpreter (shell-command-to-string "which python"))
 
@@ -80,6 +80,7 @@ function."
   (interactive)
   (when (null chatgpt-repo-path)
     (error "chatgpt-repo-path is nil. Please set chatgpt-repo-path as specified in joshcho/ChatGPT.el"))
+  (setq python-interpreter (string-trim (shell-command-to-string "which python")))
   (setq chatgpt-process (epc:start-epc python-interpreter (list (expand-file-name
                                                                  (format "%schatgpt.py"
                                                                          chatgpt-repo-path)))))
