@@ -4,12 +4,15 @@ import pkg_resources
 import os
 
 
+model = 'gpt-3.5-turbo'
+
+
 def query(query):
-    if query.startswith('Using model '):
-        close_brace = query.indexof(' ', 12)
+    global model
+    if query.lower().startswith('using model '):
+        close_brace = query.indexof(',', 12)
         model, query = query[12:close_brace], query[close_brace+1:]
-    else:
-        model = 'gpt-4'
+        model = '-'.join(model.strip().lower().split())
     if 'OPENAI_API_KEY' not in os.environ:
         return "Please set environment variable OPENAI_API_KEY"
     try:
@@ -51,3 +54,5 @@ else:
     server.register_function(query)
     server.print_port()
     server.serve_forever()
+2d2dd    except openai.error.RateLimitError:
+        return "Quota exceeded."
