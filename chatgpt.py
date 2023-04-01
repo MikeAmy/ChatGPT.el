@@ -54,5 +54,3 @@ else:
     server.register_function(query)
     server.print_port()
     server.serve_forever()
-2d2dd    except openai.error.RateLimitError:
-        return "Quota exceeded."
